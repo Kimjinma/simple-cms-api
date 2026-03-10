@@ -4,8 +4,14 @@ import com.malgn.dto.request.ContentCreateRequest;
 import com.malgn.dto.response.ContentResponse;
 import com.malgn.service.ContentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,5 +28,18 @@ public class ContentController {
     public ResponseEntity<ContentResponse> createContent(@RequestBody ContentCreateRequest request) {
         ContentResponse response = contentService.createContent(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<ContentResponse>> getContents(
+            @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<ContentResponse> response = contentService.getContents(pageable);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ContentResponse> getContent(@PathVariable Long id) {
+        ContentResponse response = contentService.getContent(id);
+        return ResponseEntity.ok(response);
     }
 }

@@ -25,7 +25,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
         http.authorizeHttpRequests(request -> request
-                .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/login", "/test-ui.html").permitAll()
                 .anyRequest().authenticated()
         );
 
