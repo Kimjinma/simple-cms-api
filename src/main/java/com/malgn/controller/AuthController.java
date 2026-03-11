@@ -24,9 +24,10 @@ public class AuthController {
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final com.malgn.configure.security.JwtProvider jwtProvider;
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+    public ResponseEntity<com.malgn.dto.response.LoginResponse> login(@RequestBody LoginRequest loginRequest) {
         UserDetails userDetails;
         
         try {
@@ -39,14 +40,10 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities()
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String role = userDetails.getAuthorities().iterator().next().getAuthority();
+        
+        String token = jwtProvider.createToken(userDetails.getUsername(), role);
 
-        HttpSession session = request.getSession(true);
-        session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new com.malgn.dto.response.LoginResponse(token));
     }
 }
